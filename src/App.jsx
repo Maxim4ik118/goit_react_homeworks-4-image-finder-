@@ -12,28 +12,30 @@ const App = () => {
   const [modal, setModal] = useState({ isOpen: false, src: '', alt: '' });
 
   useEffect(() => {
+    const requestImages = async (searchTerm, currentPage) => {
+      try {
+        setIsFetching(true);
+  
+        const { hits } = await fetchImages(searchTerm, currentPage);
+  
+        if (currentPage === 1) {
+          setImages(hits);
+        } else {
+          setImages(prevState => [...prevState, ...hits]);
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsFetching(false);
+      }
+    };
+
     if(searchTerm.length === 0 && currentPage === 1) return;
     
     requestImages(searchTerm, currentPage);
   }, [currentPage, searchTerm]);
 
-  const requestImages = async (searchTerm, currentPage) => {
-    try {
-      setIsFetching(true);
-
-      const { hits } = await fetchImages(searchTerm, currentPage);
-
-      if (currentPage === 1) {
-        setImages(hits);
-      } else {
-        setImages(prevState => [...prevState, ...hits]);
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsFetching(false);
-    }
-  };
+ 
 
   const handleSubmitSearchTerm = searchTerm => {
     setSearchTerm(searchTerm);
